@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 
-$pluginPath = Join-Path $PSScriptRoot '../Plugin/红果短剧去广告.plugin'
+$pluginPath = Join-Path $PSScriptRoot '../Plugin/Hongguo_remove_ads.lpx'
 
 if (-not (Test-Path -LiteralPath $pluginPath)) {
     throw "插件文件不存在：$pluginPath"
