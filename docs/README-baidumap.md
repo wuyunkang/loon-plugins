@@ -1,6 +1,6 @@
 # 百度地图去广告 · Loon 插件
 
-当前发布：**2026-11-17 14:14（北京时间）诊断版**，适配规则依据 iOS 百度地图 **22.2.0** 抓包编写。用户使用 Loon **3.5.3**；原生 JQ 复写要求 **3.5.1（978）或更新版本**。
+当前发布：**2026-11-17 14:39（北京时间）诊断版**，适配规则依据 iOS 百度地图 **22.2.0** 抓包编写。用户使用 Loon **3.5.3**；原生 JQ 复写要求 **3.5.1（978）或更新版本**。
 
 本次直接替换原来的 `Plugin/BaiduMap_remove_ads.lpx`，已有导入地址保持不变。插件名称和日期均包含时分。只需导入这一个插件，无需单独导入 JS 或图片。
 
@@ -11,7 +11,7 @@
 [导入 Loon](https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fwuyunkang%2Floon-plugins%2Fmain%2FPlugin%2FBaiduMap_remove_ads.lpx) · [原始插件](https://raw.githubusercontent.com/wuyunkang/loon-plugins/main/Plugin/BaiduMap_remove_ads.lpx)
 
 1. 已使用上述地址的用户，在 Loon 更新该插件；如之前导入本地文件，停用旧版后通过上述链接导入，确保只启用一份。
-2. 确认插件名为“百度地图去广告·诊断 2026-11-17 14:14”。
+2. 确认插件名为“百度地图去广告·诊断 2026-11-17 14:39”。
 3. 开启复写和 MitM，安装并在 iOS 中完全信任 Loon 证书。解密主机为 `newclient.map.baidu.com`、`ecom.map.baidu.com`、`dss0.bdstatic.com`。
 4. 完全退出百度地图，重新打开首页和“我的”各一次，再导出新抓包以核对实际响应。诊断步骤见[诊断说明](README-baidumap-diagnostic.md)。
 
@@ -23,7 +23,7 @@
 | --- | --- |
 | 旧开屏、横幅、搜索推广、通知横条及商业推广 | 精确匹配已知接口后拒绝请求，保留其他地图和导航接口 |
 | `ecom.map.baidu.com/ad-ops/afd/entry`、`material_async` | HTTP 200 且 `code=0`、字段类型符合时清空 `result.ad_info` |
-| `feed/govui/rich_content?from=homepage` | 成功响应的推荐列表换为一张可见“百度地图”文字探针卡，保留一个空白默认分类；尝试将卡片上下内边距设为各 6 |
+| `feed/govui/rich_content?from=homepage` | 成功响应的推荐列表换为一张可见“百度地图”文字探针卡，保留一个空白默认分类；尝试将卡片上内边距设为 46、下内边距设为 6，使文字下移；实际位置以手机显示为准 |
 | 同一信息流接口的其他来源 | 只移除 `feed_fengchao_ad_card` 广告卡，保留其他内容 |
 | `usercenter/mine/page` | HTTP 200 且 `error=2000` 时删除金币、金融、店铺下发字段和相关角标、金币布局项；已有对象类型的 `sport_card` 改为 `{}` |
 | 广告主机和素材 | 精确广告域名与已知素材路径拦截，不使用整站百度域名封锁 |
@@ -35,7 +35,7 @@
 
 ## 已知限制
 
-- 用户已确认上一版 Logo 和百度运动处理没有达到预期。本版的“百度地图”文字用于诊断，手机显示效果待确认。
+- 用户截图确认上一版文字位置偏上、百度运动卡片仍显示。本版尝试下移文字，运动规则暂未改变；两项效果均待手机验证。
 - 首页面板整体最小高度由 App 控制，改写卡片内边距不能保证缩小整个空白区域。
 - 删除店铺下发字段和营销角标不能保证隐藏本地“我的店铺”等功能按钮；目前未找到可靠的按钮隐藏配置。
 - 底部 AI“长按说话”入口仍未实现隐藏，不能仅凭语音资源字段推断其显示开关。

@@ -6,7 +6,7 @@ const { spawnSync } = require('node:child_process');
 
 function diagnostic() {
   const filename = 'BaiduMap_remove_ads.lpx';
-  const content = fs.readFileSync(path.join(__dirname, '../Plugin', filename), 'utf8');
+  const content = fs.readFileSync(path.join(__dirname, '../Plugin', filename), 'utf8').replace(/\r\n/g, '\n');
   const date = /^#!date=(.+)$/m.exec(content)[1];
   const version = date.replace(/[-: ]/g, '').replace(/^(\d{8})(\d{4})$/, '$1-$2');
   const lines = content.split(/\r?\n/);

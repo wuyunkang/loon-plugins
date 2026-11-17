@@ -8,7 +8,7 @@ const { isDeepStrictEqual } = require('node:util');
 const pluginPath = path.join(__dirname, '../Plugin/BaiduMap_remove_ads.lpx');
 
 function readPlugin() {
-  const content = fs.readFileSync(pluginPath, 'utf8');
+  const content = fs.readFileSync(pluginPath, 'utf8').replace(/\r\n/g, '\n');
   const sections = {};
   let section;
   for (const original of content.split(/\r?\n/)) {
@@ -511,7 +511,7 @@ function expectedHomepage(data) {
 function blankHomepageCard() {
   // 诊断版用可见文字探针检查响应渲染，保留紧凑的卡片内边距。
   return { content_type: 'feed_dynamic_card_new', content_type_modify: 'fullline', cover: '\u200b',
-    dynamicBoxStyle: { 'background-color': 'null', 'padding-bottom': '6', 'padding-top': '6' },
+    dynamicBoxStyle: { 'background-color': 'null', 'padding-bottom': '6', 'padding-top': '46' },
     components: [{ componentType: 'img-text', data: {
       text: '百度地图', textLineClamp: 1, colorDark: '#d3d9e6',
       iconUrl: '',
@@ -554,7 +554,8 @@ test('首页探针配置为居中文字，内边距收紧且无图片请求或�
   assert.equal(component.iconStyle.width, '0');
   assert.equal(component.iconStyle.height, '0');
   assert.equal(component.textStyle['text-align'], 'center');
-  assert.equal(Number(card.dynamicBoxStyle['padding-top']) + Number(card.dynamicBoxStyle['padding-bottom']), 12);
+  assert.equal(card.dynamicBoxStyle['padding-top'], '46');
+  assert.equal(card.dynamicBoxStyle['padding-bottom'], '6');
   assert.doesNotMatch(JSON.stringify(card), /baidumap:|detailUrl|jumpUrl|headline|author/);
 });
 
