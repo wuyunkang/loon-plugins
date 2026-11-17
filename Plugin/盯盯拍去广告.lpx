@@ -1,0 +1,13 @@
+#!name=盯盯拍去广告
+#!desc=清理第三方广告配置、社区与商城横幅及延保推广，保留产品支持和应急服务。自动加载远程脚本，需开启脚本和 HTTPS 解密。
+#!date=2026-11-14
+#!author=Codex
+#!tag=去广告,盯盯拍
+
+[Script]
+# appgw 的抓包端口为 18080；同时覆盖 HTTP 与 HTTPS，不拦截整个业务域名。
+http-response ^https?://(?:app|appgw)\.ddpai\.com(?::\d+)?/(?:onroad/api/(?:v1/ad/list|v2/banner/list|v[12]/activity/list)|market/api/v1/banner/list)(?:\?|$) script-path=https://raw.githubusercontent.com/wuyunkang/loon-plugins/main/Script/ddpai-adblock.js,requires-body=true,timeout=10,tag=盯盯拍去广告,enable=true
+
+[MITM]
+hostname = app.ddpai.com,appgw.ddpai.com
+
