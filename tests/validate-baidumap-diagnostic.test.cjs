@@ -89,17 +89,15 @@ test('相似路径、伪造主机、定位和导航接口不加入诊断标记',
   }
 });
 
-test('诊断版首页返回可见文字作为渲染探针，运动仍使用同一显式空对象处理', () => {
+test('诊断版首页清空推荐内容和分类，运动仍使用同一显式空对象处理', () => {
   const { content } = diagnostic();
   for (const [url, body, check] of [
     ['https://newclient.map.baidu.com/feed/govui/rich_content?from=homepage',
       { errno: 0, data: { posts: { content: [1], remain_num: 1, title: 'fixture' },
         themes: { content: [{ selected: true, query: { topic: 'default' } }] } } },
       data => {
-        const component = data.data.posts.content[0].components[0].data;
-        assert.equal(component.text, '百度地图');
-        assert.equal(component.iconUrl, '');
-        assert.equal(component.darkIconUrl, '');
+        assert.deepEqual(data.data.posts.content, []);
+        assert.deepEqual(data.data.themes.content, []);
       }],
     ['https://newclient.map.baidu.com/usercenter/mine/page',
       { error: 2000, data: { sport_card: { title: '百度运动' }, car: { keep: true } } },
