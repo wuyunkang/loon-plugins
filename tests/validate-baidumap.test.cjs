@@ -5,7 +5,7 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { isDeepStrictEqual } = require('node:util');
 
-const pluginPath = path.join(__dirname, '../Plugin/百度地图去广告.plugin');
+const pluginPath = path.join(__dirname, '../Plugin/BaiduMap_remove_ads.lpx');
 
 function readPlugin() {
   const content = fs.readFileSync(pluginPath, 'utf8');
