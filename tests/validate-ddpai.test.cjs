@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const scriptPath = path.join(__dirname, '../Script/ddpai-adblock.js');
-const pluginPath = path.join(__dirname, '../Plugin/盯盯拍去广告.plugin');
+const pluginPath = path.join(__dirname, '../Plugin/DDPai_remove_ads.lpx');
 const adPath = '/onroad/api/v1/ad/list';
 const bannerPaths = ['/onroad/api/v2/banner/list', '/market/api/v1/banner/list'];
 const activityPaths = ['/onroad/api/v1/activity/list', '/onroad/api/v2/activity/list'];
