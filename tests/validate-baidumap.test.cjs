@@ -25,7 +25,7 @@ function readPlugin() {
     }
   }
   assert.ok(sections.Rewrite?.length, '必须包含复写规则');
-  const rewrites = sections.Rewrite.filter(line => !line.startsWith('response ')).map(line => {
+  const rewrites = sections.Rewrite.filter(line => !/^(?:request|response) /.test(line)).map(line => {
     const match = /^(\S+)\s+(reject(?:-200)?)$/.exec(line);
     assert.ok(match, `只能使用文档支持的本地拒绝动作：${line}`);
     return { pattern: new RegExp(match[1], 'i'), action: match[2] };
@@ -38,7 +38,7 @@ function readPlugin() {
     assert.ok(match, `只允许精确的广告域名规则：${line}`);
     return match[1].toLowerCase();
   });
-  const filters = sections.Rewrite.filter(line => line.startsWith('response ')).map(line => {
+  const filters = sections.Rewrite.filter(line => line.includes('then response.json.jq(')).map(line => {
     const match = /^response if \$\{url\} ~= \/(.*)\/i && \$\{response\.status\} == 200 then response\.json\.jq\((".*")\)$/.exec(line);
     assert.ok(match, `JSON 复写必须限定 URL、HTTP 200 并使用内联 JQ：${line}`);
     return { pattern: new RegExp(match[1], 'i'), jq: JSON.parse(match[2]), status: 200 };
@@ -165,8 +165,9 @@ test('同一 CDN 的普通图片、图标和相似目录原样放行', () => {
 
 test('单文件插件只包含内置复写及精确广告域名，无 JS 或本地附加文件依赖', () => {
   const { content, sections, rewrites, hosts, domains, filters } = readPlugin();
-  assert.match(content, /^#!name=百度地图去广告$/m);
-  assert.match(content, /^#!date=2026-11-17$/m);
+  const version = /^#!date=(\d{4}-\d{2}-\d{2} (?:[01]\d|2[0-3]):[0-5]\d)$/m.exec(content);
+  assert.ok(version, '版本日期必须包含北京时间的时分');
+  assert.ok(content.includes(`#!name=百度地图去广告·诊断 ${version[1]}\n`), '插件名称应显示同一版本时间');
   assert.deepEqual(Object.keys(sections).sort(), ['MITM', 'Rewrite', 'Rule']);
   assert.deepEqual(hosts.sort(), ['dss0.bdstatic.com', 'ecom.map.baidu.com', 'newclient.map.baidu.com']);
   assert.equal(sections.MITM.length, 1);
@@ -508,18 +509,18 @@ function expectedHomepage(data) {
 }
 
 function blankHomepageCard() {
-  // 使用已有动态卡片渲染官方字标，收紧卡片自身的内边距。
+  // 诊断版用可见文字探针检查响应渲染，保留紧凑的卡片内边距。
   return { content_type: 'feed_dynamic_card_new', content_type_modify: 'fullline', cover: '\u200b',
     dynamicBoxStyle: { 'background-color': 'null', 'padding-bottom': '6', 'padding-top': '6' },
     components: [{ componentType: 'img-text', data: {
-      text: '\u200b', textLineClamp: 1, colorDark: '#d3d9e6',
-      iconUrl: 'https://api.map.baidu.com/images/copyright_logo_hd.png',
-      darkIconUrl: 'https://api.map.baidu.com/images/copyright_logo_hd.png',
-      iconStyle: { height: '25', width: '68', 'margin-left': '0', 'margin-right': '0',
+      text: '百度地图', textLineClamp: 1, colorDark: '#d3d9e6',
+      iconUrl: '',
+      darkIconUrl: '',
+      iconStyle: { height: '0', width: '0', 'margin-left': '0', 'margin-right': '0',
         opacity: 0.18, filter: 'grayscale(1)' },
       imgTextStyle: { flex: 1, 'justify-content': 'center', 'align-items': 'center' },
-      textStyle: { color: '#11141A', 'font-family': 'PingFang SC',
-        'font-size': 15, 'font-weight': 400, 'letter-spacing': '0%', 'margin-bottom': 0 },
+      textStyle: { color: '#9aa3b2', 'font-family': 'PingFang SC',
+        'font-size': 15, 'font-weight': 400, 'letter-spacing': '0%', 'margin-bottom': 0, 'text-align': 'center' },
     } }],
   };
 }
@@ -530,12 +531,12 @@ function blankHomepageTheme(original = {}) {
       ? original.query : { rqt: '', topic: 'default' } };
 }
 
-test('首页推荐替换为有效 Logo 占位卡和默认分类，避免两个列表都为空', () => {
+test('首页推荐替换为文字探针卡和默认分类，避免两个列表都为空', () => {
   const data = homepageFixture();
   assert.deepEqual(JSON.parse(runResponse(homepageFeedUrl, data).body), expectedHomepage(data));
 });
 
-test('首页占位卡居中显示官方字标，内边距收紧且无推广跳转', () => {
+test('首页探针配置为居中文字，内边距收紧且无图片请求或推广跳转', () => {
   const actual = JSON.parse(runResponse(homepageFeedUrl, homepageFixture()).body);
   assert.equal(actual.data.posts.content.length, 1);
   const card = actual.data.posts.content[0];
@@ -543,14 +544,16 @@ test('首页占位卡居中显示官方字标，内边距收紧且无推广跳�
   assert.equal(card.content_type_modify, 'fullline');
   assert.equal(card.components.length, 1);
   assert.equal(card.components[0].componentType, 'img-text');
-  assert.equal(card.components[0].data.text.replace(/\u200b/g, '').trim(), '');
+  assert.equal(card.components[0].data.text, '百度地图');
   const component = card.components[0].data;
-  assert.equal(component.iconUrl, 'https://api.map.baidu.com/images/copyright_logo_hd.png');
+  assert.equal(component.iconUrl, '');
   assert.equal(component.darkIconUrl, component.iconUrl);
   assert.equal(component.imgTextStyle['justify-content'], 'center');
   assert.equal(component.imgTextStyle['align-items'], 'center');
   assert.equal(component.iconStyle.opacity, 0.18);
-  assert.equal(component.iconStyle.width / component.iconStyle.height, 136 / 50);
+  assert.equal(component.iconStyle.width, '0');
+  assert.equal(component.iconStyle.height, '0');
+  assert.equal(component.textStyle['text-align'], 'center');
   assert.equal(Number(card.dynamicBoxStyle['padding-top']) + Number(card.dynamicBoxStyle['padding-bottom']), 12);
   assert.doesNotMatch(JSON.stringify(card), /baidumap:|detailUrl|jumpUrl|headline|author/);
 });
@@ -567,7 +570,7 @@ test('空白默认分类保留原查询和标识，隐藏标签内容', () => {
   assert.deepEqual(theme.labels, []);
 });
 
-test('服务器原本返回空列表时也提供有效 Logo 占位，重复处理仍稳定', () => {
+test('服务器原本返回空列表时也提供文字探针，重复处理仍稳定', () => {
   const data = homepageFixture();
   data.data.posts.content = [];
   data.data.themes.content = [];
@@ -700,4 +703,3 @@ test('运动字段缺失、为 null 或未知类型时保留，不创建新模�
 });
 
 module.exports = { readPlugin, runResponse };
-
