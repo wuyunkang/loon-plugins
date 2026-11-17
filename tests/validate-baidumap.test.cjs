@@ -502,25 +502,96 @@ function homepageFixture() {
 
 function expectedHomepage(data) {
   return { ...data, data: { ...data.data,
-    posts: { ...data.data.posts, content: [], remain_num: 0, title: '' },
-    themes: { ...data.data.themes, content: [], themeShow: false, iconExist: false, labelStyle: false },
+    posts: { ...data.data.posts, content: [blankHomepageCard()], remain_num: 0, title: '' },
+    themes: { ...data.data.themes, content: [blankHomepageTheme(data.data.themes.content[0])],
+      themeShow: false, iconExist: false, labelStyle: false },
   } };
 }
 
-test('首页清空推荐和分类，不再插入占位卡，保留其他字段', () => {
+function blankHomepageCard() {
+  // 诊断版用可见文字探针检查响应渲染，保留紧凑的卡片内边距。
+  return { content_type: 'feed_dynamic_card_new', content_type_modify: 'fullline', cover: '\u200b',
+    dynamicBoxStyle: { 'background-color': 'null', 'padding-bottom': '6', 'padding-top': '30' },
+    components: [{ componentType: 'img-text', data: {
+      text: '百度地图', textLineClamp: 1, colorDark: '#d3d9e6',
+      iconUrl: '',
+      darkIconUrl: '',
+      iconStyle: { height: '0', width: '0', 'margin-left': '0', 'margin-right': '0',
+        opacity: 0.18, filter: 'grayscale(1)' },
+      imgTextStyle: { flex: 1, 'justify-content': 'center', 'align-items': 'center' },
+      textStyle: { color: '#9aa3b2', 'font-family': 'PingFang SC',
+        'font-size': 15, 'font-weight': 400, 'letter-spacing': '0%', 'margin-bottom': 0, 'text-align': 'center' },
+    } }],
+  };
+}
+
+function blankHomepageTheme(original = {}) {
+  return { ...original, name: '\u200b', icon: '', nameIcon: '', nameIconDark: '', labels: [],
+    selected: true, query: original.query && typeof original.query === 'object' && !Array.isArray(original.query)
+      ? original.query : { rqt: '', topic: 'default' } };
+}
+
+test('首页推荐替换为文字探针卡和默认分类，避免两个列表都为空', () => {
   const data = homepageFixture();
   assert.deepEqual(JSON.parse(runResponse(homepageFeedUrl, data).body), expectedHomepage(data));
 });
 
-test('空列表保持为空且重复处理稳定', () => {
+test('首页探针配置为居中文字，内边距收紧且无图片请求或推广跳转', () => {
+  const actual = JSON.parse(runResponse(homepageFeedUrl, homepageFixture()).body);
+  assert.equal(actual.data.posts.content.length, 1);
+  const card = actual.data.posts.content[0];
+  assert.equal(card.content_type, 'feed_dynamic_card_new');
+  assert.equal(card.content_type_modify, 'fullline');
+  assert.equal(card.components.length, 1);
+  assert.equal(card.components[0].componentType, 'img-text');
+  assert.equal(card.components[0].data.text, '百度地图');
+  const component = card.components[0].data;
+  assert.equal(component.iconUrl, '');
+  assert.equal(component.darkIconUrl, component.iconUrl);
+  assert.equal(component.imgTextStyle['justify-content'], 'center');
+  assert.equal(component.imgTextStyle['align-items'], 'center');
+  assert.equal(component.iconStyle.opacity, 0.18);
+  assert.equal(component.iconStyle.width, '0');
+  assert.equal(component.iconStyle.height, '0');
+  assert.equal(component.textStyle['text-align'], 'center');
+  assert.equal(card.dynamicBoxStyle['padding-top'], '30');
+  assert.equal(card.dynamicBoxStyle['padding-bottom'], '6');
+  assert.doesNotMatch(JSON.stringify(card), /baidumap:|detailUrl|jumpUrl|headline|author/);
+});
+
+test('空白默认分类保留原查询和标识，隐藏标签内容', () => {
+  const data = homepageFixture();
+  const actual = JSON.parse(runResponse(homepageFeedUrl, data).body);
+  assert.equal(actual.data.themes.content.length, 1);
+  const theme = actual.data.themes.content[0];
+  assert.deepEqual(theme.query, data.data.themes.content[0].query);
+  assert.equal(theme.md5, data.data.themes.content[0].md5);
+  assert.equal(theme.selected, true);
+  assert.equal(theme.name.replace(/\u200b/g, '').trim(), '');
+  assert.deepEqual(theme.labels, []);
+});
+
+test('服务器原本返回空列表时也提供文字探针，重复处理仍稳定', () => {
   const data = homepageFixture();
   data.data.posts.content = [];
   data.data.themes.content = [];
   const changed = runResponse(homepageFeedUrl, data);
   const actual = JSON.parse(changed.body);
-  assert.deepEqual(actual.data.posts.content, []);
-  assert.deepEqual(actual.data.themes.content, []);
+  assert.deepEqual(actual.data.posts.content, [blankHomepageCard()]);
+  assert.deepEqual(actual.data.themes.content, [blankHomepageTheme()]);
   assert.deepEqual(runResponse(homepageFeedUrl, changed.body), {});
+});
+
+test('空白分类优先保留原选中项，异常查询结构补齐默认值', () => {
+  const data = homepageFixture();
+  data.data.themes.content = [null,
+    { name: 'other', selected: false, query: { topic: 'other' } },
+    { name: 'selected', selected: true, md5: 'selected-fixture', query: { rqt: '', topic: 'selected' } }];
+  const selected = JSON.parse(runResponse(homepageFeedUrl, data).body).data.themes.content[0];
+  assert.deepEqual(selected, blankHomepageTheme(data.data.themes.content[2]));
+  data.data.themes.content[2].query = 'unknown';
+  const repaired = JSON.parse(runResponse(homepageFeedUrl, data).body).data.themes.content[0];
+  assert.deepEqual(repaired.query, { rqt: '', topic: 'default' });
 });
 
 test('首页推荐条数归零，并保留定位及其他未知配置', () => {
@@ -574,15 +645,15 @@ test('首页推荐字段分别检查类型，不创建缺失字段或改写未�
   const data = { errno: 0, data: { posts: { content: ['fixture'], remain_num: 'unknown', title: 42 },
     themes: { content: ['fixture'], themeShow: 'unknown', iconExist: 1, labelStyle: null }, keep: true } };
   assert.deepEqual(JSON.parse(runResponse(homepageFeedUrl, data).body), { errno: 0, data: {
-    posts: { content: [], remain_num: 'unknown', title: 42 },
-    themes: { content: [], themeShow: 'unknown', iconExist: 1, labelStyle: null }, keep: true,
+    posts: { content: [blankHomepageCard()], remain_num: 'unknown', title: 42 },
+    themes: { content: [blankHomepageTheme()], themeShow: 'unknown', iconExist: 1, labelStyle: null }, keep: true,
   } });
   assert.deepEqual(JSON.parse(runResponse(homepageFeedUrl,
     { errno: 0, data: { posts: { content: [1] } } }).body),
-  { errno: 0, data: { posts: { content: [] } } });
+  { errno: 0, data: { posts: { content: [blankHomepageCard()] } } });
   assert.deepEqual(JSON.parse(runResponse(homepageFeedUrl,
     { errno: 0, data: { themes: { content: [1], themeShow: true } } }).body),
-  { errno: 0, data: { themes: { content: [], themeShow: false } } });
+  { errno: 0, data: { themes: { content: [blankHomepageTheme()], themeShow: false } } });
 });
 
 test('首页推荐重复处理幂等，相似路径及伪造主机不匹配', () => {
