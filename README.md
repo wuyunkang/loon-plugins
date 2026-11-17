@@ -4,9 +4,9 @@
 
 | 插件 | 功能与说明 | 安装 |
 | --- | --- | --- |
-| 红果短剧 | 拦截广告接口和连播广告节点；金币任务及福利奖励不可用。 | [导入](https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fwuyunkang%2Floon-plugins%2Fmain%2FPlugin%2F%E7%BA%A2%E6%9E%9C%E7%9F%AD%E5%89%A7%E5%8E%BB%E5%B9%BF%E5%91%8A.plugin) · [原始文件](https://raw.githubusercontent.com/wuyunkang/loon-plugins/main/Plugin/%E7%BA%A2%E6%9E%9C%E7%9F%AD%E5%89%A7%E5%8E%BB%E5%B9%BF%E5%91%8A.plugin) |
-| 盯盯拍 | 清理第三方广告配置、社区和商城横幅及延保推广。[详细说明](docs/README-ddpai.md) | [导入](https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fwuyunkang%2Floon-plugins%2Fmain%2FPlugin%2F%E7%9B%AF%E7%9B%AF%E6%8B%8D%E5%8E%BB%E5%B9%BF%E5%91%8A.plugin) · [原始文件](https://raw.githubusercontent.com/wuyunkang/loon-plugins/main/Plugin/%E7%9B%AF%E7%9B%AF%E6%8B%8D%E5%8E%BB%E5%B9%BF%E5%91%8A.plugin) |
-| 百度地图 | 清理开屏和部分推广，首页推荐替换为 Logo 占位。[详细说明](docs/README-baidumap.md) | [导入](https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fwuyunkang%2Floon-plugins%2Fmain%2FPlugin%2F%E7%99%BE%E5%BA%A6%E5%9C%B0%E5%9B%BE%E5%8E%BB%E5%B9%BF%E5%91%8A.plugin) · [原始文件](https://raw.githubusercontent.com/wuyunkang/loon-plugins/main/Plugin/%E7%99%BE%E5%BA%A6%E5%9C%B0%E5%9B%BE%E5%8E%BB%E5%B9%BF%E5%91%8A.plugin) |
+| 红果短剧 | 拦截广告接口和连播广告节点；金币任务及福利奖励不可用。 | [导入](https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fwuyunkang%2Floon-plugins%2Fmain%2FPlugin%2F%E7%BA%A2%E6%9E%9C%E7%9F%AD%E5%89%A7%E5%8E%BB%E5%B9%BF%E5%91%8A.lpx) · [原始文件](https://raw.githubusercontent.com/wuyunkang/loon-plugins/main/Plugin/%E7%BA%A2%E6%9E%9C%E7%9F%AD%E5%89%A7%E5%8E%BB%E5%B9%BF%E5%91%8A.lpx) |
+| 盯盯拍 | 清理第三方广告配置、社区和商城横幅及延保推广。[详细说明](docs/README-ddpai.md) | [导入](https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fwuyunkang%2Floon-plugins%2Fmain%2FPlugin%2F%E7%9B%AF%E7%9B%AF%E6%8B%8D%E5%8E%BB%E5%B9%BF%E5%91%8A.lpx) · [原始文件](https://raw.githubusercontent.com/wuyunkang/loon-plugins/main/Plugin/%E7%9B%AF%E7%9B%AF%E6%8B%8D%E5%8E%BB%E5%B9%BF%E5%91%8A.lpx) |
+| 百度地图 | 清理开屏和部分推广，首页推荐替换为 Logo 占位。[详细说明](docs/README-baidumap.md) | [导入](https://www.nsloon.com/openloon/import?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Fwuyunkang%2Floon-plugins%2Fmain%2FPlugin%2F%E7%99%BE%E5%BA%A6%E5%9C%B0%E5%9B%BE%E5%8E%BB%E5%B9%BF%E5%91%8A.lpx) · [原始文件](https://raw.githubusercontent.com/wuyunkang/loon-plugins/main/Plugin/%E7%99%BE%E5%BA%A6%E5%9C%B0%E5%9B%BE%E5%8E%BB%E5%B9%BF%E5%91%8A.lpx) |
 
 ## 使用说明
 
